@@ -1,2 +1,2 @@
 # vitalZ-assessment
-user list 
+user list nextjs project for assessment interview purpose
