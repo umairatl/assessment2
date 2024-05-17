@@ -1,4 +1,5 @@
 import { UserAnalysis } from "@/interface/userDetails";
+import { handleChangePage, handleChangeRowsPerPage } from "@/utils/pagination";
 import {
   Paper,
   Table,
@@ -27,29 +28,15 @@ const UserAnalysisTable = ({ data }: { data: UserAnalysis[] }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const handleChangePage = (
-    event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number
-  ) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
   useEffect(() => {
     const getRows = () => {
-      let data2: any[] = [];
+      let tableData: any[] = [];
       for (let x of data) {
-        data2.push(
+        tableData.push(
           createData(x.HRVDate, x.ScoreType, x.StressorIndex, x.VitalzScore)
         );
       }
-      setRows(data2);
+      setRows(tableData);
     };
 
     getRows();
@@ -95,8 +82,12 @@ const UserAnalysisTable = ({ data }: { data: UserAnalysis[] }) => {
                   native: true,
                 },
               }}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
+              onPageChange={(event, newPage) =>
+                handleChangePage(event, newPage, setPage)
+              }
+              onRowsPerPageChange={(event) =>
+                handleChangeRowsPerPage(event, setRowsPerPage, setPage)
+              }
               ActionsComponent={TablePaginationActions}
             />
           </TableRow>

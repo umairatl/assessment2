@@ -1,27 +1,13 @@
-import { Box, Button, Grid, Paper, Stack, Typography } from "@mui/material";
-import axios from "axios";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
-import { makeStyles } from "tss-react/mui";
-import CircularProgress from "@mui/material/CircularProgress";
+import { getUserList } from "@/utils/api";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-
-const baseURL =
-  "https://exam-vitalz-backend-8267f8929b82.herokuapp.com/api/getUserList";
-
-interface UserData {
-  UserName: string;
-  UserID: number;
-  DeviceCompany: string;
-}
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import { Box, Button, Grid, Paper, Stack, Typography } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { makeStyles } from "tss-react/mui";
 
 const useStyles = makeStyles()((theme) => ({
-  wrapLayout: {
-    // background:
-    //   "radial-gradient(circle, rgba(249,179,74,1) 0%, rgba(228,217,188,1) 100%)",
-    // minHeight: "100vh",
-  },
   box: {
     width: "90%",
     height: "100%",
@@ -39,36 +25,58 @@ const useStyles = makeStyles()((theme) => ({
     "&:hover": {
       border: "2px solid #e5840d",
     },
+    [theme.breakpoints.down("lg")]: {
+      minHeight: "12rem",
+    },
+    [theme.breakpoints.down("md")]: {
+      minHeight: "5rem",
+    },
     [theme.breakpoints.down("sm")]: {
       padding: "2rem",
     },
   },
+  btn: {
+    width: "fit-content",
+    marginBottom: "1rem",
+    color: "#f9b34a",
+    borderRadius: "1rem",
+    padding: "0.8rem 1.2rem",
+    marginTop: "3rem",
+    "&: hover": {
+      background: "#f9b34a",
+      color: "white",
+    },
+  },
 }));
+
+interface UserData {
+  UserName: string;
+  UserID: number;
+  DeviceCompany: string;
+}
 
 export default function Home() {
   const [list, setList] = useState<UserData[]>([]);
-  const [selectedCard, setSelectedCard] = useState(null);
+  const [selectedId, setSelectedId] = useState(null);
   const router = useRouter();
   const { classes } = useStyles();
 
   const handleCardClick = (cardId: any) => {
-    setSelectedCard(cardId);
+    setSelectedId(cardId);
   };
 
   useEffect(() => {
-    axios.get(baseURL).then((response) => {
-      setList(response.data);
-    });
+    getUserList(setList);
   }, []);
 
   const viewDetails = () => {
-    if (selectedCard) {
-      router.push(`daily-statistics/${selectedCard}`);
+    if (selectedId) {
+      router.push(`daily-statistics/${selectedId}`);
     }
   };
 
   return (
-    <Grid container justifyContent="center" className={classes.wrapLayout}>
+    <Grid container justifyContent="center">
       <Box className={classes.box}>
         <Grid
           container
@@ -99,9 +107,9 @@ export default function Home() {
                       className={classes.wrapPaper}
                       sx={{
                         background:
-                          selectedCard === x.UserID ? "#f9b34a" : "white",
+                          selectedId === x.UserID ? "#f9b34a" : "white",
                         border:
-                          selectedCard === x.UserID
+                          selectedId === x.UserID
                             ? "2px solid #e5840d"
                             : "2px solid white",
                       }}
@@ -122,18 +130,7 @@ export default function Home() {
           <Stack width="100%" alignItems="flex-end">
             <Button
               onClick={viewDetails}
-              sx={{
-                width: "fit-content",
-                marginBottom: "1rem",
-                color: "#f9b34a",
-                borderRadius: "1rem",
-                padding: "0.8rem 1.2rem",
-                marginTop: "3rem",
-                "&: hover": {
-                  background: "#f9b34a",
-                  color: "white",
-                },
-              }}
+              className={classes.btn}
               endIcon={<ArrowForwardIcon />}
             >
               View Details

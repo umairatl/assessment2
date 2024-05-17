@@ -1,3 +1,4 @@
+// document setup to use with tss mui
 import App from "next/app";
 import { createEmotionSsrAdvancedApproach } from "tss-react/next/pagesDir";
 

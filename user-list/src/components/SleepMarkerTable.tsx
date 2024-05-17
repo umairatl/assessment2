@@ -1,4 +1,9 @@
 import {
+  formatTime,
+  handleChangePage,
+  handleChangeRowsPerPage,
+} from "@/utils/pagination";
+import {
   Paper,
   Table,
   TableBody,
@@ -11,17 +16,6 @@ import {
 } from "@mui/material";
 import TablePaginationActions from "@mui/material/TablePagination/TablePaginationActions";
 import { useEffect, useState } from "react";
-import { makeStyles } from "tss-react/mui";
-import { parseISO, format } from "date-fns";
-
-interface SleepData {
-  HRVDate: string;
-  SleepOnset: string;
-  WakeUpTime: string;
-  Awake: string;
-  Light: string;
-  Deep: string;
-}
 
 function createData(
   HRVDate: string,
@@ -34,51 +28,17 @@ function createData(
   return { HRVDate, SleepOnset, WakeUpTime, Awake, Light, Deep };
 }
 
-const useStyles = makeStyles()((theme) => ({
-  tableContainer: {
-    minWidth: 650,
-    maxHeight: 400,
-    overflow: "auto",
-    [theme.breakpoints.down("sm")]: {
-      minWidth: 100,
-    },
-  },
-}));
-
 const SleepMarkerTable = (props: any) => {
   const { data } = props || [];
   const [rows, setRows] = useState<any[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const { classes } = useStyles();
-
-  const handleChangePage = (
-    event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number
-  ) => {
-    setPage(newPage);
-  };
-
-  const formatTime = (dateString: any) => {
-    if (!dateString) {
-      return "Invalid date";
-    }
-    const date = parseISO(dateString);
-    return format(date, "HH:mm:ss");
-  };
-
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
 
   useEffect(() => {
     const getRows = () => {
-      let data2: any[] = [];
+      let tableData: any[] = [];
       for (let x of data) {
-        data2.push(
+        tableData.push(
           createData(
             x.HRVDate,
             formatTime(x?.SleepOnset),
@@ -89,7 +49,7 @@ const SleepMarkerTable = (props: any) => {
           )
         );
       }
-      setRows(data2);
+      setRows(tableData);
     };
 
     getRows();
@@ -139,8 +99,12 @@ const SleepMarkerTable = (props: any) => {
                   native: true,
                 },
               }}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
+              onPageChange={(event, newPage) =>
+                handleChangePage(event, newPage, setPage)
+              }
+              onRowsPerPageChange={(event) =>
+                handleChangeRowsPerPage(event, setRowsPerPage, setPage)
+              }
               ActionsComponent={TablePaginationActions}
             />
           </TableRow>

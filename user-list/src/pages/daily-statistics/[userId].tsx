@@ -1,12 +1,13 @@
+import { CustomTabPanel, a11yProps } from "@/components/MuiTabPanel";
+import { getUserAnalysisData, getUserSleepMarkerData } from "@/utils/api";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Box, Button, Grid, Typography } from "@mui/material";
-import axios from "axios";
+import Tab from "@mui/material/Tab";
+import Tabs from "@mui/material/Tabs";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-import dynamic from "next/dynamic";
 import { makeStyles } from "tss-react/mui";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 const SleepMarkerTable = dynamic(
   async () => await import("../../components/SleepMarkerTable"),
@@ -21,40 +22,6 @@ const UserAnalysisTable = dynamic(
     ssr: false,
   }
 );
-
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-function CustomTabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-      style={{ width: "100%" }}
-    >
-      {value === index && (
-        <Box sx={{ pt: 3 }}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
-    </div>
-  );
-}
-
-function a11yProps(index: number) {
-  return {
-    id: `simple-tab-${index}`,
-    "aria-controls": `simple-tabpanel-${index}`,
-  };
-}
 
 const useStyles = makeStyles()((theme) => ({
   wrapLayout: {
@@ -88,8 +55,8 @@ const useStyles = makeStyles()((theme) => ({
 const UserDailyStatistics = () => {
   const router = useRouter();
   const { userId } = router.query;
-  const [sleepMarkerData, setSleepMarkerData] = useState([]);
-  const [userAnalysisData, setUserAnalysisData] = useState([]);
+  const [sleepMarkerData, setSleepMarkerData] = useState<any[]>([]);
+  const [userAnalysisData, setUserAnalysisData] = useState<any[]>([]);
   const [value, setValue] = useState(0);
   const { classes } = useStyles();
 
@@ -97,39 +64,11 @@ const UserDailyStatistics = () => {
     setValue(newValue);
   };
 
-  const getUserSleepMarkerData = () => {
-    axios
-      .get(
-        `https://exam-vitalz-backend-8267f8929b82.herokuapp.com/api/getUserSleepMarker?userID=${userId}`
-      )
-      .then((response) => {
-        if (response.status === 200) {
-          setSleepMarkerData(response.data);
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching sleep marker data:", error);
-      });
-  };
-
-  const getUserAnalysisData = () => {
-    axios
-      .get(
-        `https://exam-vitalz-backend-8267f8929b82.herokuapp.com/api/getUserAnalysis?userID=${userId}`
-      )
-      .then((response) => {
-        if (response.status === 200) {
-          setUserAnalysisData(response.data);
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching sleep analysis data:", error);
-      });
-  };
-
   useEffect(() => {
-    getUserSleepMarkerData();
-    getUserAnalysisData();
+    if (userId) {
+      getUserSleepMarkerData(setSleepMarkerData, userId as string);
+      getUserAnalysisData(setUserAnalysisData, userId as string);
+    }
   }, [userId]);
 
   return (

@@ -1,3 +1,4 @@
+// document setup to use with tss mui
 import Document, { Html, Head, Main, NextScript } from "next/document";
 import { augmentDocumentWithEmotionCache } from "./_app";
 
