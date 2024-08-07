@@ -1,4 +1,4 @@
-# vitalZ-assessment
+# take home assessment for iv2
 user list nextjs project for assessment interview purpose
 
 how to run
